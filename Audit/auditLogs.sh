@@ -1,5 +1,5 @@
 AUTHLOG="/var/log/auth.log"
-SYSLOG="/var/log/sys.log"
+SYSLOG="/var/log/syslog"
 APTLOG="/var/log/apt/history.log"
 OUTPUT_DIR="Audits"
 #Test on an Ubuntu box
@@ -55,19 +55,3 @@ $printFunction "$(grep "Stopped" $SYSLOG)" "$OUTPUT_DIR/stopped.txt"
 $printFunction "$(grep -B 3 -A 1 "apt remove" $APTLOG)" "$OUTPUT_DIR/removed.txt"
 $printFunction "$(grep -B 3 -A 1 "apt purge" $APTLOG)" "$OUTPUT_DIR/purged.txt"
 $printFunction "$(grep -B 3 -A 1 "apt install" $APTLOG)" "$OUTPUT_DIR/installed.txt"
-
-<<'###'
-#audits for root actions and attempts
-grep "/usr/bin/su" $AUTHLOG >> su.txt
-grep "incorrect password attempt" $AUTHLOG >> incorrects.txt
-grep "USER=root" $AUTHLOG >> roots.txt
-
-#audits services
-grep "Closed" $SYSLOG >> closed.txt
-grep "Stopped" $SYSLOG >> stopped.txt
-
-#audit apt
-grep -B 3 -A 1 "apt remove" $APTLOG
-grep -B 3 -A 1 "apt purge" $APTLOG
-grep -B 3 -A 1 "apt install" $APTLOG
-###
