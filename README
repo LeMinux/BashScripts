@@ -1,5 +1,5 @@
 These are some bash scripts that I made either for practicality or for fun.
 
 Be carful about the scripts in Destory. As the name suggests they are meant to
-destroy a (Linux) system. The permission on these files are set to 400 (r--------) (user read only),
+destroy a (Linux) system. The permission on these files you will have to manually enable executable permissions,
 and you will need to uncommenet the danger AND complete the validity check.
