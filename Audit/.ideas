@@ -1,9 +1,0 @@
-for auditing the system you could have it so you pass in a file for services you
-do not want running
-
-for auditing the system you can have the user pass in a time. This time will check
-this far back in the logs for behavior
-
-for auditing you can also add a verbose option
-
-for auditing auth you can pass in a user or a group and check what they have done
