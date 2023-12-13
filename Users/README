@@ -1,0 +1,38 @@
+This is a bash script to help add multiple users and set them to their groups.
+If the group does not exist, it will make it.
+
+This script will also check if the user or group(s) have sudo permissions. If
+sudo permission is detected it will prompt to confirm if this is correct.
+
+There are two modes
+
+No File Mode:
+	FORMAT -> userAndSSH.sh
+	If no file is specified then it will prompt for the creation of just a
+	single user. This way a file with a single line is not needed.
+	The prompts will ask for the user name and groups.
+
+File Mode:
+	FORMAT -> ./userAndSSH.sh <file>
+
+	If a file is specified it will parse through it to verify if the syntax is
+	correct. The file MUST contain the group delimiter '|' and the secondary
+	group delimiter ':' in the order of <user>|<primary group>:<list of secondary groups>
+
+	There must be a user entry, but primary and secondary groups are optional.
+	If only the user name is specified it will simply create the user.
+	Ex:
+	BigGuppy|:
+
+	If multiple secondary groups are desired it must follow as if it was the
+	normal adduser command. Separated by commas with no whitespace
+	Ex:
+	John|:Accounting,FloorOne
+	Mary|:Secretary,TopFloor
+
+	If the file is verified to have the correct syntax it will parse through
+	and create the accounts. If even one syntax error is detected it will not
+	parse through the file. This is done because it is better to know right
+	off the bat to know about errors rather than being told in a sea of
+	valid and invalid statments. This ensures that all users are made and none
+	will be missed.
