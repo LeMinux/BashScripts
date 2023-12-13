@@ -10,15 +10,11 @@
 #TODO
 #check if define -p does actually matter for checkGroup
 #code smarter and have main do checks before creating user. I.E. make create user simply accept the params and have main split before hand.
+#If all users are given sudo then prompting the user for sudo permission of specified users should not happen
+#user input of a single user
+
+#CONTINUOUS
 #conduct a test on a VM
-
-#Note that typically users will be added to the secondary group
-#The primary group is normally the user's name
-
-if [ "$EUID" -ne 0 ]; then
-	echo "This script must be run with sudo."
-	exit 1
-fi
 
 PRINT_NORMAL=$(tput sgr0)
 PRINT_RED=$(tput setaf 1)
@@ -35,7 +31,6 @@ RET_FAILURE=1
 MSG_CUSTOM=-1
 MSG_NOT_ROOT=1
 MSG_ALREADY_EXISTS=2
-
 
 function printToLog {
 	local logFile=$1
@@ -82,7 +77,7 @@ function checkGroup {
 	#check if each group exists
 	for element in ${groupArray[@]}; do
 		if [[ $(awk '/'"$element:"'/' /etc/group) == "" ]]; then
-			#groupadd "$groupName"
+			groupadd "$element"
 			echo "Group \"$element\" does not exist making it"
 		fi
 	done
@@ -133,7 +128,7 @@ function createUser {
 
 	#build command
 	local creationString
-	creationString="useradd -p $(openssl passwd -6 $password)"
+	creationString="useradd -m -p $(openssl passwd -6 $password)"
 
 	#build sudo checks
 	local rootCheck
@@ -165,7 +160,7 @@ function createUser {
 	if hasSudoPermission $rootCheck; then
 		echo -e "${PRINT_RED}Warning:${PRINT_NORMAL}"
 		if getYesNo "The user \"$userName\" will be given sudo permissions. Is this correct?"; then
-			#$creationString
+			$creationString
 			echo "$verbosity"
 			echo "Random password for user \"$userName\" is -> $password"
 			echo ""
@@ -173,7 +168,7 @@ function createUser {
 			printToLog "$LOG_FILE" "$entry" $MSG_NOT_ROOT
 		fi
 	else
-		#$creationString
+		$creationString
 		echo "$verbosity"
 		echo "Random password for user \"$userName\" is -> $password"
 		echo ""
@@ -248,9 +243,14 @@ function validFileSyntax {
 
 #main
 function main {
+	if [ "$EUID" -ne 0 ]; then
+		echo "This script must be run with sudo."
+		exit 1
+	fi
+
 	#reset not created file or create it
 	if [ -f "$LOG_FILE" ]; then
-		filesize=$(stat -c %s "Not_Created.txt")
+		local filesize=$(stat -c %s "Not_Created.txt")
 		if [[ filesize -ge 0 ]]; then
 			printf '' > "$LOG_FILE"
 		fi
@@ -260,24 +260,21 @@ function main {
 
 	#checks if everyone will be given sudo permission and if this is dangerously wanted
 	if [[ $(awk '!/^#/ && $1 == "ALL"' /etc/sudoers) != "" ]]; then
-		allSudo=-1
 		echo -e "${PRINT_RED}WARNING: ALL USERS ARE GIVEN ROOT PERMISSIONS!${PRINT_NORMAL}"
-		getYesNo "Are you sure you want this?"
-		allsudo=$?
 
-		if [[ $allSudo -eq $RET_FAILURE ]]; then
+		if getYesNo "Are you sure you want this?"; then
+			echo "Procced at your own risk"
+		else
 			echo "Remove or comment the line that begins with ALL"
 			exit 1
-		else
-			echo "Procced at your own risk"
 		fi
 	fi
 
 	#make one user
 	if [[ "$#" -eq 0 ]]; then
-		uName=""
-		groupName=""
-		secondaryGroups=""
+		local uName=""
+		local groupName=""
+		local secondaryGroups=""
 
 		echo "~~No file given so this will only prompt for one user creation~~"
 		while [[ "$uName" == "" ]]; do
@@ -302,7 +299,7 @@ function main {
 
 		#TODO user input
 	elif [[ "$#" -eq 1 ]]; then
-		file=$1
+		local file=$1
 		if validFileSyntax "$file"; then
 			while IFS= read -r entry; do
 				if [[ "$entry" != "" ]]; then
