@@ -1,7 +1,10 @@
-UID_MIN=1000
-UID_MAX=30000
+#this script is a mild destruction
 
 function main {
+	uid_min=1000
+	uid_max=30000
+	uid_restrict=1000
+
 	if [ "$EUID" -ne 0 ]; then
 		echo "This script must be run with sudo."
 		exit 1
@@ -12,7 +15,7 @@ function main {
 	randLength=10
 	randString=$(cat /dev/random | tr -dc "$randSet" | fold -w "$randLength" | head -n 1)
 
-	echo -e "THIS WILL LOCK ALL HUMAN USERS!!\nTo validate ensured destruction type this string $randString"
+	echo -e "THIS WILL LOCK ALL HUMAN USERS!!\nTo validate ensured locking type this string-> $randString"
 	validate="#"
 
 	while [[ ${validate} != ${randString} ]];
@@ -22,7 +25,7 @@ function main {
 
 	#used getent incase the passwd file is not in /etc/passwd
 	#uses a range of UIDs
-	#getent passwd | awk -F: ''$UID_MIN' <= $3 && $3 < '$UID_MAX' {system(passwd -l $1)}'
+	getent passwd | awk -F: ''$uid_min' <= $3 && $3 < '$uid_max' && $3 != '$uid_restrict' {system("echo locking " $1 " && passwd -l " $1)}'
 }
 
 main; exit 0
