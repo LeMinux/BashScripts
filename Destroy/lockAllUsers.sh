@@ -25,7 +25,7 @@ function main {
 
 	#used getent incase the passwd file is not in /etc/passwd
 	#uses a range of UIDs
-	getent passwd | awk -F: ''$uid_min' <= $3 && $3 < '$uid_max' && $3 != '$uid_restrict' {system("echo locking " $1 " && passwd -l " $1)}'
+	#getent passwd | awk -F: ''$uid_min' <= $3 && $3 < '$uid_max' && $3 != '$uid_restrict' {system("echo locking " $1 " && passwd -l " $1)}'
 }
 
 main; exit 0
