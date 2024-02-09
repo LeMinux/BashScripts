@@ -1,14 +1,14 @@
-#so far this doesn't actually rotate keys
+#!/bin/bash
 
+#so far this doesn't actually rotate keys
 function main {
-	user=""
-	host=""
-	outfile="$(echo ~)/.ssh/id_"
-	#outfile=""
-	valid="false"
-	selection=""
-	bytes=""
-	curDate="$(date +"%d-%b-%Y")"
+	local user=""
+	local host=""
+	local outfile="$(echo ~)/.ssh/id_"
+	local valid="false"
+	local selection=""
+	local bytes=""
+	local curDate="$(date +"%d-%b-%Y")"
 
 	while [[ "$user" == "" ]]; do
 		read -p "Enter the host username: " user
@@ -17,7 +17,6 @@ function main {
 	while [[ "$host" == "" ]]; do
 		read -p "Enter the host to where you are connecting: " host
 	done
-
 
 	while [[ "$valid" == "false" ]]; do
 		echo -e "1) rsa"
@@ -66,8 +65,8 @@ function main {
 	done
 
 	#to effectively make a do-while loop
-	filenameInput=""
-	confirmName="#"
+	local filenameInput=""
+	local confirmName="#"
 
 	echo "Note the keys will be saved in ~/.ssh/ even with renaming"
 	while [[ "$filenameInput" != "$confirmName" ]]; do

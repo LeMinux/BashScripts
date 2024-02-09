@@ -1,3 +1,4 @@
+#!/bin/bash
 #COMPLETED
 #take a command line argument for user files
 #Format will be <user>|<group>
